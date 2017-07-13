@@ -67,7 +67,7 @@ func main() {
 	if *config.Database.Provider == "mssql" {
 		db, err = gorm.Open("mssql", fmt.Sprintf("sqlserver://%s:%s@%s:1433?database=%s", *config.Database.User, *config.Database.Password, *config.Database.Host, *config.Database.Database))
 	} else if *config.Database.Provider == "mysql" {
-		db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=%s", *config.Database.User, *config.Database.Host, *config.Database.Password, *config.Database.Database, time.Local.String()))
+		db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=%s", *config.Database.User, *config.Database.Password, *config.Database.Host, *config.Database.Database, time.Local.String()))
 	} else if *config.Database.Provider == "postgres" {
 		db, err = gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", *config.Database.Host, *config.Database.User, *config.Database.Database, *config.Database.Password))
 	} else if *config.Database.Provider == "sqlite3" {
