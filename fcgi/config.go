@@ -3,6 +3,8 @@ package main
 import (
 	"io/ioutil"
 
+	"strings"
+
 	"github.com/Eun/domwatch/fcgi/api1"
 	hjson "github.com/hjson/hjson-go"
 	"github.com/mitchellh/mapstructure"
@@ -54,10 +56,27 @@ func (config *Config) SetDefaults() error {
 	if config.Database.Provider == nil {
 		config.Database.Provider = new(string)
 		*config.Database.Provider = "sqlite3"
+	} else {
+		*config.Database.Provider = strings.ToLower(*config.Database.Provider)
 	}
 	if config.Database.Database == nil {
 		config.Database.Database = new(string)
 		*config.Database.Database = "domwatch.db"
 	}
+
+	if config.Database.Host == nil {
+		config.Database.Host = new(string)
+		*config.Database.Host = ""
+	}
+
+	if config.Database.User == nil {
+		config.Database.User = new(string)
+		*config.Database.User = ""
+	}
+	if config.Database.Password == nil {
+		config.Database.Password = new(string)
+		*config.Database.Password = ""
+	}
+
 	return nil
 }

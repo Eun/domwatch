@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -52,7 +53,7 @@ func main() {
 		logger = log.New(os.Stderr, "", log.LstdFlags)
 	} else {
 		var logFile *os.File
-		logFile, err = os.OpenFile(*config.LogFile, os.O_APPEND|os.O_CREATE, 0600)
+		logFile, err = os.OpenFile(*config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -61,7 +62,18 @@ func main() {
 
 	}
 
-	db, err = gorm.Open(*config.Database.Provider, *config.Database.Database)
+	if *config.Database.Provider == "mssql" {
+		db, err = gorm.Open("mssql", fmt.Sprintf("sqlserver://%s:%s@%s:1433?database=%s", *config.Database.User, *config.Database.Password, *config.Database.Host, *config.Database.Database))
+	} else if *config.Database.Provider == "mysql" {
+		db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=%s", *config.Database.User, *config.Database.Password, *config.Database.Database, *config.Database.Host))
+	} else if *config.Database.Provider == "postgres" {
+		db, err = gorm.Open("postgres", fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", *config.Database.Host, *config.Database.User, *config.Database.Database, *config.Database.Password))
+	} else if *config.Database.Provider == "sqlite3" {
+		db, err = gorm.Open(*config.Database.Provider, *config.Database.Database)
+	} else {
+		logger.Fatalf("Unknown provider '%s'\n", *config.Database.Provider)
+	}
+
 	if err != nil {
 		logger.Fatalln(err)
 	}
