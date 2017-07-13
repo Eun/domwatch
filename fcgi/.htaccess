@@ -2,6 +2,7 @@
 # rename fcgi to domwatch.fcgi
 AddHandler fcgid-script .fcgi
 RewriteEngine on
+RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d [OR]
 RewriteCond %{REQUEST_URI} ^/$
