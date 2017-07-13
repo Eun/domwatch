@@ -1,0 +1,207 @@
+html, body {
+    font-size: 16px;
+    background: #24292E;
+}
+
+header, footer {
+    display: block;
+    width: 60rem; 
+    margin: 0 auto;
+    color: #C8C9CA;
+    padding: 1rem 0;
+    position: relative;
+}
+
+header h2 {
+    font-weight: 300;
+}
+
+main {
+    display: block;
+    width: 60rem; 
+    margin: 0 auto;
+    overflow: visible;
+    white-space: nowrap;
+    position: relative;
+    background: #FAFBFC;
+    color: #333;
+    border-radius: .2rem;
+    padding: 0;
+    position: relative;
+}
+
+div {
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+}
+section {
+    padding: 1rem;
+    box-sizing: border-box;
+    display: inline-block;
+    background: #FAFBFC;
+}
+
+input[type="checkbox"] {
+    position: absolute;
+    left: -200%;
+    right: -200%;
+
+}
+input[type="checkbox"]:checked ~ section {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 99;
+}
+
+label, input[type="submit"] {
+    display: inline-block;
+    min-width: 8rem;
+    font-size: 1.3rem;
+    border-radius: .16rem;
+    padding: .2rem .4rem;
+    background: transparent;
+    cursor: pointer;
+    margin: 0 auto;
+    border: .05rem solid #24292E;
+    color: #333;
+    font-weight: 600;
+}
+
+label:hover, input[type="submit"]:hover {
+    background: #24292E;
+    color: #fff;
+}
+
+
+input[type="checkbox"]:checked ~ section label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: block;
+    color: #333;
+    background: transparent;
+    border: 0;
+}
+
+
+input[type="checkbox"]:checked ~ section label:before {
+    content: "Back";
+    display: inline-block;
+    min-width: 6rem;
+    font-size: 1rem;
+    border-radius: .16rem;
+    padding: .2rem .4rem;
+    background: transparent;
+    cursor: pointer;
+    margin: 0 auto;
+    border: .05rem solid #24292E;
+    color: #333;
+    font-weight: 600;
+    position: absolute;
+    left: 1em;
+}
+
+input[type="checkbox"]:checked ~ section label:hover {
+    background: transparent;
+    color: #333;
+    border: 0;
+}
+
+input[type="checkbox"]:checked ~ section label:hover:before {
+    background: #24292E;
+    color: #fff;
+}
+
+
+form {
+    display: none;
+}
+
+input[type="checkbox"]:checked ~ section form {
+    display: inline-block;
+}
+
+
+
+h1, h2 {
+    padding: 0;
+    margin: 0;
+}
+
+
+input {
+    display: block;
+    margin: .6rem 0;
+}
+
+input[type="text"], input[type="email"] {
+    width: 20rem;
+    font-size: 1.3rem;
+    border: .1rem solid #cecece;
+    border-radius: .16rem;
+    padding: .2rem .4rem;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+content {
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    width: 30rem; 
+    z-index: 0;
+    top: 1rem;
+    right: 0;
+    animation: 1s linear 4s fadeOut;
+    animation-fill-mode: forwards; 
+}
+
+content a {
+    display: block;
+    position: relative;
+    top: 100rem;
+    border-radius: .2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: .3rem;
+    color: #333;
+}
+
+content a:nth-child(2) {
+    top: 200rem;
+}
+content a:nth-child(3) {
+    top: 300rem;
+}
+
+content a.success {
+        background: #aed581;
+}
+
+content a.failed {
+        background: #ff8a80;
+}
+
+footer p {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+}
+
+footer p a, footer p a:link, footer p a:active, footer p a:visited, footer p a:hover {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+footer p a:hover {
+    text-decoration: underline;
+}

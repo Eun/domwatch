@@ -1,0 +1,8 @@
+# install and enable fcgid (libapache2-mod-fcgid)
+# rename fcgi to domwatch.fcgi
+AddHandler fcgid-script .fcgi
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d [OR]
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^(.*)$ domwatch.fcgi/$1 [QSA,L]

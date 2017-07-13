@@ -1,0 +1,20 @@
+{
+    "CheckInterval": "6h",  // check domains every 6 hours
+    "DNSServer": "8.8.8.8", // Root dns server to use
+    "Mail": {
+        "Sender": "domwatch@example.com",
+        "Server": "smtp.example.com",
+        //"Port": 25
+        //"Username": "domwatch@example.com",
+        //"Password": "password"
+        //"Auth": "CRAM-MD5" // CRAM-MD5 or PLAIN
+    },
+    "Database": {
+        "Provider": "sqlite3", // mssql, mysql, postgres or sqlite3
+        //"Host": "hostname",
+        //"User": "username",
+        //"Password": "password",
+        "Database": "domwatch.db",
+    }
+
+}
