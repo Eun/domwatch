@@ -151,6 +151,7 @@ func (api *API) watchDomains() {
 				return
 			}
 			db = db.Delete(&dom)
+			db = db.Delete(&watches)
 		} else {
 			dom.LastChecked = now
 			db = db.Save(&dom)
