@@ -28,6 +28,7 @@ type Config struct {
 	CheckInterval    *string
 	intervalDuration time.Duration
 	DNSServer        *string
+	LogFile          *string
 }
 
 // NewConfigFromMap creates a new config instance from a map

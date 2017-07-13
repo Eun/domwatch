@@ -11,8 +11,6 @@ import (
 
 	"encoding/json"
 
-	"os"
-
 	"strconv"
 
 	"github.com/Eun/domwatch"
@@ -25,9 +23,10 @@ type API struct {
 	db        *gorm.DB
 	closeChan chan bool
 	config    *Config
+	logger    *log.Logger
 }
 
-func NewApi(config *Config, db *gorm.DB, router *mux.Router) (*API, error) {
+func NewApi(config *Config, db *gorm.DB, router *mux.Router, logger *log.Logger) (*API, error) {
 	var api API
 	api.db = db
 
@@ -45,6 +44,8 @@ func NewApi(config *Config, db *gorm.DB, router *mux.Router) (*API, error) {
 	router.HandleFunc("/stats", api.statsRoute)
 	router.HandleFunc("/watch", api.watchRoute)
 	router.HandleFunc("/unwatch", api.unwatchRoute)
+
+	api.logger = logger
 
 	return &api, nil
 }
@@ -87,7 +88,7 @@ func (api *API) writeSuccessResponse(w http.ResponseWriter, v interface{}) {
 
 func (api *API) logError(w http.ResponseWriter, err error) {
 	id, _ := genUUID()
-	log.Printf("Error ID=%s: %s", id, err.Error())
+	api.logger.Printf("Error ID=%s: %s", id, err.Error())
 	api.writeError(w, fmt.Sprintf("A wild error appeard, thankfully it was logged, its id is %s", id))
 }
 
@@ -113,12 +114,12 @@ func (*devNullWriter) Write(p []byte) (n int, err error) {
 }
 
 func (api *API) watchDomains() {
-	log.Println("Checking domains")
+	api.logger.Println("Checking domains")
 	now := time.Now().UTC().Unix()
 	var domains []Domain
 	err := api.db.Find(&domains).Error
 	if err != nil {
-		log.Printf("Error on watchDomains: %s", err.Error())
+		api.logger.Printf("Error on watchDomains: %s", err.Error())
 		return
 	}
 
@@ -140,13 +141,13 @@ func (api *API) watchDomains() {
 			continue
 		}
 
-		log.Printf("Checking '%s'\n", dom.Domain)
-		available, err = domwatch.IsDomainAvailable(*api.config.DNSServer, dom.Domain, "tcp", []uint16{dns.TypeNS, dns.TypeSOA}, log.New(os.Stderr, "", log.LstdFlags))
+		api.logger.Printf("Checking '%s'\n", dom.Domain)
+		available, err = domwatch.IsDomainAvailable(*api.config.DNSServer, dom.Domain, "tcp", []uint16{dns.TypeNS, dns.TypeSOA}, api.logger)
 		if err == nil && available {
-			log.Printf("'%s' is available\n", dom.Domain)
+			api.logger.Printf("'%s' is available\n", dom.Domain)
 			err = api.notifyWatchers(watches, &dom)
 			if err != nil {
-				log.Printf("Error on notifyUsers: %s", err.Error())
+				api.logger.Printf("Error on notifyUsers: %s", err.Error())
 				return
 			}
 			db = db.Delete(&dom)
@@ -154,7 +155,7 @@ func (api *API) watchDomains() {
 			dom.LastChecked = now
 			db = db.Save(&dom)
 			if err != nil {
-				log.Printf("Error  for '%s': %s\n", dom.Domain, err.Error())
+				api.logger.Printf("Error  for '%s': %s\n", dom.Domain, err.Error())
 			}
 		}
 
@@ -162,7 +163,7 @@ func (api *API) watchDomains() {
 
 	err = db.Error
 	if err != nil {
-		log.Printf("Error on watchDomains: %s", err.Error())
+		api.logger.Printf("Error on watchDomains: %s", err.Error())
 		return
 	}
 }
@@ -177,7 +178,7 @@ func (api *API) notifyWatchers(watches []Watch, domain *Domain) error {
 		}
 		err = api.notifyUser(&email, domain)
 		if err != nil {
-			log.Printf("Error on notifyUsers: %s", err.Error())
+			api.logger.Printf("Error on notifyUsers: %s", err.Error())
 		}
 	}
 

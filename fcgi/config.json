@@ -1,6 +1,7 @@
 {
     "CheckInterval": "6h",  // check domains every 6 hours
     "DNSServer": "8.8.8.8", // Root dns server to use
+    //"LogFile": "", // logfile to use, if null goes to stderr
     "Mail": {
         "Sender": "domwatch@example.com",
         "Server": "smtp.example.com",

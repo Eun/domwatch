@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/fcgi"
+	"os"
 	"runtime"
 
 	"github.com/Eun/domwatch/fcgi/api1"
@@ -46,9 +47,23 @@ func main() {
 		}
 	}
 
+	var logger *log.Logger
+	if config.LogFile == nil {
+		logger = log.New(os.Stderr, "", log.LstdFlags)
+	} else {
+		var logFile *os.File
+		logFile, err = os.OpenFile(*config.LogFile, os.O_APPEND|os.O_CREATE, 0600)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer logFile.Close()
+		logger = log.New(logFile, "", log.LstdFlags)
+
+	}
+
 	db, err = gorm.Open(*config.Database.Provider, *config.Database.Database)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatalln(err)
 	}
 	defer db.Close()
 
@@ -56,9 +71,9 @@ func main() {
 
 	var api *api1.API
 
-	api, err = api1.NewApi(&config.Config, db, router.PathPrefix("/api1").Subrouter())
+	api, err = api1.NewApi(&config.Config, db, router.PathPrefix("/api1").Subrouter(), logger)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatalln(err)
 	}
 	api.Run()
 	defer api.Close()
@@ -70,7 +85,7 @@ func main() {
 	} else if *tcp != "" { // Run as FCGI via TCP
 		listener, err := net.Listen("tcp", *tcp)
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 		defer listener.Close()
 
@@ -78,7 +93,7 @@ func main() {
 	} else if *unix != "" { // Run as FCGI via UNIX socket
 		listener, err := net.Listen("unix", *unix)
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatal(err)
 		}
 		defer listener.Close()
 
@@ -87,6 +102,6 @@ func main() {
 		err = fcgi.Serve(nil, router)
 	}
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 }
