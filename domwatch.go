@@ -29,7 +29,6 @@ func IsDomainAvailable(server string, domain string, transport string, types []u
 	var response *dns.Msg
 	client.Net = transport
 
-	domainExists := false
 	// some nameservers do not support multiple Questions
 	// so pack them into multiple requests
 	for _, t := range types {
@@ -42,24 +41,27 @@ func IsDomainAvailable(server string, domain string, transport string, types []u
 				continue
 			}
 
-			// ANSWER
-			if len(response.Answer) > 0 || len(response.Ns) > 0 {
-				domainExists = true
-				break
+			if len(response.Answer) > 0 {
+				for _, a := range response.Answer {
+					if strings.ToLower(a.Header().Name) == domain {
+						return false, nil
+					}
+				}
+
+			}
+
+			if len(response.Ns) > 0 {
+				for _, a := range response.Ns {
+					if strings.ToLower(a.Header().Name) == domain {
+						return false, nil
+					}
+				}
+
 			}
 		}
-
-		if domainExists {
-			break
-		}
 	}
-
-	if domainExists {
-		debugLogger.Printf("%s is not available", domain)
-	} else {
-		debugLogger.Printf("%s is available", domain)
-	}
-	return !domainExists, nil
+	debugLogger.Printf("%s is available", domain)
+	return true, nil
 }
 
 func getNameServers(server string, domain string, transport string, debugLogger *log.Logger) ([]string, error) {
