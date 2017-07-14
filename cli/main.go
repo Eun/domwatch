@@ -35,7 +35,7 @@ func main() {
 
 	args := flag.Args()
 	if len(args) <= 0 {
-		fmt.Printf("usage: %s <options> host\n", path.Base(os.Args[0]))
+		fmt.Printf("usage: %s <options> host <host2> <host3>...\n", path.Base(os.Args[0]))
 		fmt.Println("    Options:")
 		fmt.Println("    -tcp          Force TCP")
 		fmt.Println("    -udp          Force UDP")
@@ -57,21 +57,6 @@ func main() {
 	transport := "tcp"
 	if *useUDP == true {
 		transport = "udp"
-	}
-
-	host := args[0]
-
-	host = strings.TrimSpace(host)
-	host = strings.Trim(host, ".")
-
-	if !govalidator.IsDNSName(host) {
-		fmt.Fprintf(os.Stderr, "'%s' is not a domain name\n", host)
-		os.Exit(1)
-	}
-
-	if strings.Index(host, ".") <= 0 {
-		fmt.Fprintf(os.Stderr, "'%s' is not a domain name\n", host)
-		os.Exit(1)
 	}
 
 	var types []uint16
@@ -120,16 +105,33 @@ func main() {
 		debugLogger.SetOutput(os.Stderr)
 	}
 
-	available, err := domwatch.IsDomainAvailable("8.8.8.8", host, transport, types, debugLogger)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+	for i := 0; i < len(args); i++ {
+		host := args[i]
+
+		host = strings.TrimSpace(host)
+		host = strings.Trim(host, ".")
+
+		if !govalidator.IsDNSName(host) {
+			fmt.Fprintf(os.Stderr, "'%s' is not a domain name\n", host)
+			os.Exit(1)
+		}
+
+		if strings.Index(host, ".") <= 0 {
+			fmt.Fprintf(os.Stderr, "'%s' is not a domain name\n", host)
+			os.Exit(1)
+		}
+		available, err := domwatch.IsDomainAvailable("8.8.8.8", host, transport, types, debugLogger)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		if available {
+			fmt.Printf("'%s' is AVAILABLE\n", host)
+		} else {
+			fmt.Printf("'%s' is NOT available\n", host)
+		}
 	}
-	if available {
-		fmt.Printf("'%s' is AVAILABLE\n", host)
-	} else {
-		fmt.Printf("'%s' is NOT available\n", host)
-	}
+
 }
 
 type devNullWriter struct {
