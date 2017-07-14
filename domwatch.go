@@ -30,25 +30,26 @@ func IsDomainAvailable(server string, domain string, transport string, types []u
 	client.Net = transport
 
 	domainExists := false
+	// some nameservers do not support multiple Questions
+	// so pack them into multiple requests
+	for _, t := range types {
+		for _, ns := range nameServers {
+			debugLogger.Printf("Querying '%s' with type '%d'\n", ns, t)
+			request.SetQuestion(domain, t)
+			response, _, err = client.Exchange(&request, ns+":53")
+			if err != nil {
+				debugLogger.Printf("Error from nameserver %s: %s", ns, err.Error())
+				continue
+			}
 
-	for _, ns := range nameServers {
-		debugLogger.Printf("Querying '%s'\n", ns)
-		request.Question = make([]dns.Question, len(types))
-		for i := len(types) - 1; i >= 0; i-- {
-			request.Question[i] = dns.Question{
-				Name:   domain,
-				Qtype:  types[i],
-				Qclass: dns.ClassINET,
+			// ANSWER
+			if len(response.Answer) > 0 || len(response.Ns) > 0 {
+				domainExists = true
+				break
 			}
 		}
-		response, _, err = client.Exchange(&request, ns+":53")
-		if err != nil {
-			debugLogger.Printf("Error from nameserver %s: %s", ns, err.Error())
-			continue
-		}
 
-		if len(response.Answer) > 0 {
-			domainExists = true
+		if domainExists {
 			break
 		}
 	}

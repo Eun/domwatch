@@ -205,3 +205,14 @@ footer p a, footer p a:link, footer p a:active, footer p a:visited, footer p a:h
 footer p a:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 70rem) {
+    div {
+        display: block;
+        width: 100%;
+    }
+    header, footer, main {
+        margin: 0;
+        width: auto;
+    }
+}

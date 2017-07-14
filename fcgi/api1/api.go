@@ -209,7 +209,7 @@ You are also subscribed to following domains: {{range $index, $element := .Other
 {{end}}
 Sincerely,
 
-domwatch
+dom.watch
 `
 
 func (api *API) notifyUser(email *Email, domain *Domain) (err error) {
