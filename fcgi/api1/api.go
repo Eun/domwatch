@@ -160,13 +160,15 @@ func (api *API) watchDomains() {
 			}
 		}
 
-	}
-
-	err = db.Error
+			err = db.Error
 	if err != nil {
 		api.logger.Printf("Error on watchDomains: %s", err.Error())
 		return
 	}
+
+	}
+
+
 }
 
 func (api *API) notifyWatchers(watches []Watch, domain *Domain) error {
